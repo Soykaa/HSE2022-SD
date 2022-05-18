@@ -1,27 +1,13 @@
-import os, shutil
+import os
 from Commands.ls import Ls
 from Executor.context import Context
 from Executor.executor import Executor
-
-
-def delete_tmp_files_and_dirs():
-    folder = os.getcwd() + os.path.sep + 'tmp'
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
 def test_ls_without_args():
     context = Context()
     ls = Ls([])
     output, ret_code = ls.execute(context)
-    print(output)
     if Executor.current_directory.__contains__('Commands'):
         expected_output_list = ['__init__.py', '__pycache__', 'test_cat.py',
                                 'test_cd.py', 'test_echo.py', 'test_grep.py',
