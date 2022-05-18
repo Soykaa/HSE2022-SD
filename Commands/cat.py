@@ -27,9 +27,7 @@ class Cat:
         """
         paths = []
         for arg in self.args:
-            if arg.startswith(os.path.sep):
-                paths.append(Executor.current_directory + arg)
-            else:
+            if not arg.startswith(os.path.sep):
                 paths.append(Executor.current_directory + os.path.sep + arg)
         for path_to_file in paths:
             if not FileManager.is_file(path_to_file):

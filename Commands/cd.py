@@ -45,6 +45,8 @@ class Cd:
                 current_directory = os.path.abspath(self.__remove_suffix(self.args[0], os.path.sep))
         if not os.path.exists(current_directory):
             return f'cd: no such directory {current_directory}', 2
+        if os.path.isfile(current_directory):
+            return f'cd: directory is expected but file {current_directory} was provided', 3
         Executor.current_directory = current_directory
         return self.output, 0
 
