@@ -56,7 +56,7 @@ def test_cd_with_two_dots():
     _, ret_code = cd.execute(context)
     assert ret_code == 0
     output, _ = ls.execute(context)
-    assert output == '5.txt\nthree'
+    assert output == '5.txt' + os.linesep + 'three'
     Executor.current_directory = prev_directory
 
 

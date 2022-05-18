@@ -15,6 +15,7 @@ def create_tmp_files_and_dirs():
     test_dir_len = len(os.getcwd() + os.path.sep + dir_with_files[dir_len:] + os.path.sep)
     return dir_with_files, dir_with_files[dir_len:], [path1[test_dir_len:], path2[test_dir_len:], path3[test_dir_len:]]
 
+
 def test_ls_without_args():
     context = Context()
     ls = Ls([])
@@ -30,7 +31,7 @@ def test_ls_without_args():
                                 'main.py', 'parser', 'README.md',
                                 'requirements.txt', 'Review', 'Substitution',
                                 'venv']
-    actual_output_list = output.split('\n')
+    actual_output_list = output.split(os.linesep)
     assert ret_code == 0
     assert len(expected_output_list) >= len(actual_output_list)
     for file in actual_output_list:
@@ -42,7 +43,7 @@ def test_ls_with_correct_args():
     context = Context()
     ls = Ls([directory])
     output, ret_code = ls.execute(context)
-    actual_output_list = output.split('\n')
+    actual_output_list = output.split(os.linesep)
     assert ret_code == 0
     assert len(expected_output_list) == len(actual_output_list)
     for file in actual_output_list:
