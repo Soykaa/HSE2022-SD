@@ -1,25 +1,27 @@
-import os
-import tempfile
-
+import os, shutil
 from Commands.ls import Ls
 from Executor.context import Context
 from Executor.executor import Executor
 
 
-def create_tmp_files_and_dirs():
-    dir_with_files = tempfile.mkdtemp(prefix=os.getcwd() + os.path.sep)
-    dir_len = len(os.getcwd() + os.path.sep)
-    fd1, path1 = tempfile.mkstemp(prefix=os.getcwd() + os.path.sep + dir_with_files[dir_len:] + os.path.sep)
-    fd2, path2 = tempfile.mkstemp(prefix=os.getcwd() + os.path.sep + dir_with_files[dir_len:] + os.path.sep)
-    fd3, path3 = tempfile.mkstemp(prefix=os.getcwd() + os.path.sep + dir_with_files[dir_len:] + os.path.sep)
-    test_dir_len = len(os.getcwd() + os.path.sep + dir_with_files[dir_len:] + os.path.sep)
-    return dir_with_files, dir_with_files[dir_len:], [path1[test_dir_len:], path2[test_dir_len:], path3[test_dir_len:]]
+def delete_tmp_files_and_dirs():
+    folder = os.getcwd() + os.path.sep + 'tmp'
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
 def test_ls_without_args():
     context = Context()
     ls = Ls([])
     output, ret_code = ls.execute(context)
+    print(output)
     if Executor.current_directory.__contains__('Commands'):
         expected_output_list = ['__init__.py', '__pycache__', 'test_cat.py',
                                 'test_cd.py', 'test_echo.py', 'test_grep.py',
@@ -36,20 +38,6 @@ def test_ls_without_args():
     assert len(expected_output_list) >= len(actual_output_list)
     for file in actual_output_list:
         assert expected_output_list.__contains__(file)
-
-
-def test_ls_with_correct_args():
-    full_directory, directory, expected_output_list = create_tmp_files_and_dirs()
-    context = Context()
-    ls = Ls([directory])
-    output, ret_code = ls.execute(context)
-    actual_output_list = output.split(os.linesep)
-    assert ret_code == 0
-    assert len(expected_output_list) == len(actual_output_list)
-    for file in actual_output_list:
-        assert expected_output_list.__contains__(file)
-        os.remove(directory + os.path.sep + file)
-    os.removedirs(directory)
 
 
 def test_ls_with_many_args():
