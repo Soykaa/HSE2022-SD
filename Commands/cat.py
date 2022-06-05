@@ -1,9 +1,10 @@
 from typing import Tuple
 
-from optional import Optional
+import os
 
 from Executor.context import Context
 from Executor.file_manager import FileManager
+from Executor.executor import Executor
 
 
 class Cat:
@@ -24,11 +25,16 @@ class Cat:
         :returns: Status code
         :rtype: int
         """
+        paths = []
         for arg in self.args:
-            if not FileManager.is_file(arg):
-                return f'cat: no such file {arg}', 2
+            if not arg.startswith(os.path.sep):
+                paths.append(Executor.current_directory + os.path.sep + arg)
+        for path_to_file in paths:
+            if not FileManager.is_file(path_to_file):
+                return f'cat: no such file {path_to_file}', 2
         if len(self.args) > 0:
-            result = ''.join([FileManager.get_file_content(arg) for arg in self.args])
+            result = ''.join([FileManager.get_file_content(path_to_file)
+                              for path_to_file in paths])
         else:
             if context.state.is_empty():
                 return "cat: empty input", 1

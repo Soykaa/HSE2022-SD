@@ -1,9 +1,11 @@
 import argparse
 import re
+import os
 from typing import List, Tuple, Optional
 
 from Executor.context import Context
 from Executor.file_manager import FileManager
+from Executor.executor import Executor
 
 
 class ArgumentParserError(Exception):
@@ -79,6 +81,10 @@ class Grep:
                              append_number=result_of_parsing.count)
         else:
             for file_name in files:
+                if not file_name.startswith(os.path.sep):
+                    file_name = Executor.current_directory + os.path.sep + file_name
+                else:
+                    file_name = Executor.current_directory + file_name
                 if not FileManager.is_file(file_name):
                     return f'grep: no such file {file_name}', 2
                 file_content = FileManager.get_file_content(file_name)

@@ -6,7 +6,7 @@ from Executor.context import Context
 
 
 def create_tmp_file(content):
-    fd, path = tempfile.mkstemp()
+    fd, path = tempfile.mkstemp(prefix=os.getcwd() + os.path.sep)
     with os.fdopen(fd, 'w') as tmp:
         tmp.write(content)
     return fd, path
@@ -15,8 +15,9 @@ def create_tmp_file(content):
 def create_file_and_run_test(content, lines, words, num_bytes):
     context = Context()
     fd, path = create_tmp_file(content)
+    num = len(os.getcwd() + os.path.sep)
     try:
-        wc = Wc([path])
+        wc = Wc([path[num:]])
         output, ret_code = wc.execute(context)
         assert ret_code == 0
         assert output == f'{lines} {words} {num_bytes} {path}'
@@ -37,7 +38,7 @@ def test_not_empty_file():
 
 
 def test_with_error():
-    error = 'wc: no such file f'
+    error = 'wc: no such file ' + os.getcwd() + os.path.sep + 'f'
     context = Context()
     wc = Wc(['f'])
     output, ret_code = wc.execute(context)
@@ -62,8 +63,9 @@ def test_with_files():
     context = Context()
     fd1, path1 = create_tmp_file(content)
     fd2, path2 = create_tmp_file(content)
+    num = len(os.getcwd() + os.path.sep)
     try:
-        wc = Wc([path1, path2])
+        wc = Wc([path1[num:], path2[num:]])
         output, ret_code = wc.execute(context)
         assert ret_code == 0
         assert output == f'1 2 11 {path1}\n1 2 11 {path2}'

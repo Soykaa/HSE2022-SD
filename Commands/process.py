@@ -1,9 +1,9 @@
 import subprocess
 from typing import Tuple
 
-from optional import Optional
 
 from Executor.context import Context
+from Executor.executor import Executor
 
 
 class Process:
@@ -29,7 +29,8 @@ class Process:
 
         command = ' '.join([self.name] + args)
         result = subprocess.run(
-            command, shell=True, capture_output=True, text=True, env=context.env.get_vars()
+            command, shell=True, capture_output=True, text=True, env=context.env.get_vars(),
+            cwd=Executor.current_directory
         )
 
         if result.returncode != 0:

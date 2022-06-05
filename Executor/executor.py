@@ -1,6 +1,7 @@
 from typing import List
 
 from optional import Optional
+from Executor.file_manager import FileManager
 
 from Executor.context import Context
 from Environment.impl import environment
@@ -15,6 +16,7 @@ class Executor:
         self.commands = []
         self.env = environment
 
+    current_directory = FileManager.get_current_directory()
     is_shell_terminated = False
 
     def set_commands(self, commands: List):

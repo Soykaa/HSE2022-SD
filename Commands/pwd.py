@@ -1,9 +1,7 @@
 from typing import List, Tuple, Any
 
-from optional import Optional
-
 from Executor.context import Context
-from Executor.file_manager import FileManager
+from Executor.executor import Executor
 
 
 class Pwd:
@@ -25,7 +23,7 @@ class Pwd:
         """
         if len(self.args) > 0 or not context.state.is_empty():
             return "pwd: too many arguments", 1
-        result = FileManager.get_current_directory()
+        result = Executor.current_directory
         return result, 0
 
     def __str__(self):

@@ -9,7 +9,7 @@ from Executor.context import Context
 
 
 def create_tmp_file(content):
-    fd, path = tempfile.mkstemp()
+    fd, path = tempfile.mkstemp(prefix=os.getcwd() + os.path.sep)
     with os.fdopen(fd, 'w') as tmp:
         tmp.write(content)
     return fd, path
@@ -114,53 +114,61 @@ def test_simple_string_execute():
     content = 'hello\nworld'
     context = Context()
     fd1, path1 = create_tmp_file(content)
+    num = len(os.getcwd() + os.path.sep)
 
-    args = ["hello", path1]
+    args = ["hello", path1[num:]]
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
 
     assert ret_code == 0
     assert output == f'{path1}: hello'
+    os.remove(path1)
 
 
 def test_or_string_execute():
     content = 'hello world\nbye\nhello bye\ngray'
     context = Context()
     fd1, path1 = create_tmp_file(content)
+    num = len(os.getcwd() + os.path.sep)
 
-    args = ["hello|bye", path1]
+    args = ["hello|bye", path1[num:]]
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
 
     assert ret_code == 0
     assert output == f'{path1}: hello world\n{path1}: bye\n{path1}: hello bye'
+    os.remove(path1)
 
 
 def test_or_inside_string_execute():
     content = 'gray, grey\ngrey 1233\ngray 1244\nhello world\nend grey'
     context = Context()
     fd1, path1 = create_tmp_file(content)
+    num = len(os.getcwd() + os.path.sep)
 
-    args = ["gr(a|e)y", path1]
+    args = ["gr(a|e)y", path1[num:]]
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
 
     assert ret_code == 0
     assert output == f'{path1}: gray, grey\n{path1}: grey 1233\n{path1}: gray 1244\n{path1}: end grey'
+    os.remove(path1)
 
 
 def test_char_array_string_execute():
     content = "babble\nbebble\nbibble\nbobble\nbubble\nhello world\n babble hello\nno such grep"
     context = Context()
     fd1, path1 = create_tmp_file(content)
+    num = len(os.getcwd() + os.path.sep)
 
-    args = ["b[aeiou]bble", path1]
+    args = ["b[aeiou]bble", path1[num:]]
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
 
     assert ret_code == 0
     assert output == (f"{path1}: babble\n{path1}: bebble\n{path1}: bibble\n"
                       f"{path1}: bobble\n{path1}: bubble\n{path1}:  babble hello")
+    os.remove(path1)
 
 
 def test_simple_string_multiple_files():
@@ -170,13 +178,16 @@ def test_simple_string_multiple_files():
 
     fd1, path1 = create_tmp_file(content1)
     fd2, path2 = create_tmp_file(content2)
+    num = len(os.getcwd() + os.path.sep)
 
-    args = ["hello", path1, path2]
+    args = ["hello", path1[num:], path2[num:]]
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
 
     assert ret_code == 0
     assert output == f"{path1}: hello world1\n{path1}: hello1\n" + f"{path2}: hello world2\n{path2}: hello2"
+    os.remove(path1)
+    os.remove(path2)
 
 
 def test_ignore_case():
@@ -184,13 +195,15 @@ def test_ignore_case():
     context = Context()
 
     fd, path = create_tmp_file(content)
+    num = len(os.getcwd() + os.path.sep)
 
-    args = ["Hello", path, '-i']
+    args = ["Hello", path[num:], '-i']
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
 
     assert ret_code == 0
     assert output == f'{path}: Hello IM PASHA\n{path}: hello IM KATYA'
+    os.remove(path)
 
 
 def test_ignore_case_two_files():
@@ -200,48 +213,57 @@ def test_ignore_case_two_files():
     context = Context()
     fd1, path1 = create_tmp_file(content1)
     fd2, path2 = create_tmp_file(content2)
+    num = len(os.getcwd() + os.path.sep)
 
-    args = ["hello", "-i", path1, path2]
+    args = ["hello", "-i", path1[num:], path2[num:]]
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
     print(output)
     assert ret_code == 0
     assert output == f"{path1}: Hello World\n{path1}:  hello world\n" + f"{path2}: Hello World1\n{path2}:  hello world"
+    os.remove(path1)
+    os.remove(path2)
 
 
 def test_search_like_word():
     content = "hello worldmy name id daniel\nhello world"
     context = Context()
     fd, path = create_tmp_file(content)
-    args = ["hello world", "-w", path]
+    num = len(os.getcwd() + os.path.sep)
+    args = ["hello world", "-w", path[num:]]
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
     print(output)
     assert ret_code == 0
     assert output == f"{path}: hello world"
+    os.remove(path)
 
 
 def test_use_flag_a():
     content = "hello\nworld1\nworld2\nworld3\nworld4\nworld5"
     context = Context()
     fd, path = create_tmp_file(content)
-    args = ["hello", "-A", "5", path]
+    num = len(os.getcwd() + os.path.sep)
+    args = ["hello", "-A", "5", path[num:]]
 
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
     print(output)
     assert ret_code == 0
     assert output == f"{path}: hello\n{path}: world1\n{path}: world2\n{path}: world3\n{path}: world4\n{path}: world5"
+    os.remove(path)
 
 
 def test_use_flag_a_double_find():
     content = "hello\nhello\nworld2\nworld3\nworld4\nworld5"
     context = Context()
     fd, path = create_tmp_file(content)
-    args = ["hello", "-A", "3", path]
+    num = len(os.getcwd() + os.path.sep)
+    args = ["hello", "-A", "3", path[num:]]
 
     grep = Grep(args=args)
     output, ret_code = grep.execute(context)
 
     assert ret_code == 0
     assert output == f"{path}: hello\n{path}: hello\n{path}: world2\n{path}: world3\n{path}: world4"
+    os.remove(path)

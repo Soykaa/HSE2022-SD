@@ -1,9 +1,10 @@
 from typing import List, Tuple
 
-from optional import Optional
+import os
 
 from Executor.context import Context
 from Executor.file_manager import FileManager
+from Executor.executor import Executor
 
 
 class Wc:
@@ -24,6 +25,13 @@ class Wc:
         :returns: Status code
         :rtype: int
         """
+        paths = []
+        for arg in self.args:
+            if arg.startswith(os.path.sep):
+                paths.append(Executor.current_directory + arg)
+            else:
+                paths.append(Executor.current_directory + os.path.sep + arg)
+        self.args = paths
         if len(self.args) > 0:
             for arg in self.args:
                 if not FileManager.is_file(arg):
